@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: activo2incidencias-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: activo2incidencias
+      POSTGRES_USER: activo2incidencias
+      POSTGRES_PASSWORD: activo2incidencias
+    ports:
+      - "5432:5432"
+    volumes:
+      - activo2incidencias_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U activo2incidencias"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  activo2incidencias_pgdata:

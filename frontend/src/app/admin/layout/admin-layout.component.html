@@ -1,0 +1,49 @@
+<div class="layout">
+  <aside class="sidebar">
+    <div class="marca">
+      <img src="/assets/branding/mercadona-logo.jpg" alt="Logo" class="marca-logo" />
+      <span class="marca-nombre">Activo 2 · Incidencias</span>
+    </div>
+
+    <nav class="menu">
+      <a routerLink="/admin/dashboard" routerLinkActive="activo" class="menu-item">
+        <span class="menu-icono">▦</span> Dashboard
+      </a>
+      <a routerLink="/admin/edificios" routerLinkActive="activo" class="menu-item">
+        <span class="menu-icono">▢</span> Edificios
+      </a>
+      <a routerLink="/admin/zonas" routerLinkActive="activo" class="menu-item">
+        <span class="menu-icono">◫</span> Zonas
+      </a>
+      <a routerLink="/admin/departamentos" routerLinkActive="activo" class="menu-item">
+        <span class="menu-icono">▤</span> Departamentos
+      </a>
+      <a routerLink="/admin/responsables" routerLinkActive="activo" class="menu-item">
+        <span class="menu-icono">◔</span> Responsables
+      </a>
+      <a routerLink="/admin/asignaciones" routerLinkActive="activo" class="menu-item">
+        <span class="menu-icono">⇄</span> Asignaciones
+      </a>
+      <a routerLink="/admin/incidencias" routerLinkActive="activo" class="menu-item">
+        <span class="menu-icono">⚑</span> Incidencias
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      @if (administrador(); as admin) {
+        <div class="usuario">
+          <div class="usuario-avatar">{{ admin.nombre.charAt(0) }}</div>
+          <div class="usuario-datos">
+            <strong>{{ admin.nombre }}</strong>
+            <span>{{ admin.email }}</span>
+          </div>
+        </div>
+      }
+      <button class="btn btn-secondary btn-block" (click)="cerrarSesion()">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <main class="contenido">
+    <router-outlet></router-outlet>
+  </main>
+</div>

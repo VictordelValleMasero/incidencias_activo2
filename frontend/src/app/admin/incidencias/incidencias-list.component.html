@@ -1,0 +1,104 @@
+<div class="pagina">
+  <header class="pagina-header">
+    <div>
+      <h1>Incidencias</h1>
+      <p>Incidencias comunicadas por los empleados a través del módulo Incidencias</p>
+    </div>
+  </header>
+
+  <form [formGroup]="filtros" (ngSubmit)="buscar()" class="tabla-toolbar">
+    <div class="filtros">
+      <input type="date" formControlName="fecha" />
+      <select formControlName="edificioId">
+        <option value="">Todos los edificios</option>
+        @for (e of edificios(); track e.id) {
+          <option [value]="e.id">{{ e.nombre }}</option>
+        }
+      </select>
+      <select formControlName="zonaId">
+        <option value="">Todas las zonas</option>
+        @for (z of zonasFiltroDisponibles(); track z.id) {
+          <option [value]="z.id">{{ z.nombre }}</option>
+        }
+      </select>
+      <select formControlName="departamentoId">
+        <option value="">Todos los departamentos</option>
+        @for (d of departamentos(); track d.id) {
+          <option [value]="d.id">{{ d.nombre }}</option>
+        }
+      </select>
+      <select formControlName="estado">
+        <option value="">Todos los estados</option>
+        @for (e of estados; track e) {
+          <option [value]="e">{{ e }}</option>
+        }
+      </select>
+      <label class="filtro-check">
+        <input type="checkbox" formControlName="whatsappError" />
+        Solo con error WhatsApp
+      </label>
+      <input type="search" formControlName="texto" placeholder="Buscar por texto..." />
+      <button type="submit" class="btn btn-primary">Filtrar</button>
+    </div>
+  </form>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Edificio</th>
+          <th>Zona</th>
+          <th>Departamento</th>
+          <th>Responsable</th>
+          <th>Estado</th>
+          <th>Descripción</th>
+          <th>Imágenes</th>
+          <th>WhatsApp</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (inc of incidencias(); track inc.id) {
+          <tr (click)="abrir(inc.id)">
+            <td>{{ inc.codigo }}</td>
+            <td>{{ inc.fecha }}</td>
+            <td>{{ inc.hora }}</td>
+            <td>{{ inc.edificio }}</td>
+            <td>{{ inc.zona }}</td>
+            <td>{{ inc.departamento }}</td>
+            <td>{{ inc.responsableNotificado || '—' }}</td>
+            <td>
+              <span class="badge" [ngClass]="{
+                'badge-success': inc.estado === 'RESUELTA' || inc.estado === 'NOTIFICADA',
+                'badge-warning': inc.estado === 'NUEVA' || inc.estado === 'EN_CURSO' || inc.estado === 'EN_REVISION',
+                'badge-danger': inc.estado === 'ERROR_NOTIFICACION',
+                'badge-neutral': inc.estado === 'CERRADA' || inc.estado === 'DESCARTADA'
+              }">{{ inc.estado }}</span>
+            </td>
+            <td class="col-descripcion">{{ inc.descripcionResumida }}</td>
+            <td>{{ inc.tieneImagenes ? 'Sí' : 'No' }}</td>
+            <td>
+              @if (inc.whatsappEnviado) {
+                <span class="badge badge-success">Enviado</span>
+              } @else {
+                <span class="badge badge-danger">{{ inc.whatsappError ? 'Error' : 'Pendiente' }}</span>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="11">No hay incidencias con los filtros seleccionados.</td></tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="paginacion">
+      <button class="btn btn-secondary" (click)="cambiarPagina(-1)" [disabled]="paginaActual() === 0">Anterior</button>
+      <span>Página {{ paginaActual() + 1 }} de {{ totalPaginas() || 1 }} ({{ totalElementos() }} incidencias)</span>
+      <button class="btn btn-secondary" (click)="cambiarPagina(1)" [disabled]="paginaActual() + 1 >= totalPaginas()">Siguiente</button>
+    </div>
+  }
+</div>

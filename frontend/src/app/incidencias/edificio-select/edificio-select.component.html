@@ -1,0 +1,53 @@
+<div class="pantalla">
+  <header class="cabecera">
+    <button type="button" class="btn-volver" (click)="volver()" aria-label="Volver">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 5l-7 7 7 7" />
+      </svg>
+    </button>
+    <h1>Comunicar incidencia</h1>
+    <span class="spacer"></span>
+  </header>
+
+  <p class="subtitulo">Selecciona el edificio en el que se encuentra la incidencia.</p>
+
+  @if (cargando()) {
+    <div class="estado-centrado">
+      <div class="spinner"></div>
+      <p>Cargando edificios...</p>
+    </div>
+  }
+
+  @if (!cargando() && error()) {
+    <div class="alert alert-error">
+      {{ error() }}
+      <button type="button" class="btn btn-secondary reintentar" (click)="cargar()">Reintentar</button>
+    </div>
+  }
+
+  @if (!cargando() && !error()) {
+    <div class="lista-edificios">
+      @for (edificio of edificios(); track edificio.id) {
+        <button type="button" class="tarjeta-edificio" (click)="seleccionar(edificio)">
+          <div class="tarjeta-icono">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 21V6a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v15" />
+              <path d="M14 21V10a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v11" />
+              <path d="M2 21h20" />
+              <path d="M7 8h2M7 12h2M7 16h2" />
+            </svg>
+          </div>
+          <div class="tarjeta-texto">
+            <strong>{{ edificio.nombre }}</strong>
+            <span>{{ descripcion(edificio) }}</span>
+          </div>
+          <svg class="tarjeta-flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      } @empty {
+        <p class="vacio">No hay edificios configurados todavía.</p>
+      }
+    </div>
+  }
+</div>

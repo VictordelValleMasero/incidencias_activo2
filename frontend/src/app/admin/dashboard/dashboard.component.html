@@ -1,0 +1,92 @@
+<div class="pagina">
+  <header class="pagina-header">
+    <div>
+      <h1>Dashboard</h1>
+      <p>Resumen general de la actividad de incidencias</p>
+    </div>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+
+  @if (!cargando() && error()) {
+    <div class="alert alert-error">No se ha podido cargar el resumen del dashboard.</div>
+  }
+
+  @if (!cargando() && resumen(); as r) {
+
+    @if (r.errorWhatsapp > 0) {
+      <div class="alert alert-error">
+        Hay {{ r.errorWhatsapp }} incidencia(s) con error de notificación por WhatsApp.
+        <a routerLink="/admin/incidencias" [queryParams]="{ whatsappError: true }">Revisar</a>
+      </div>
+    }
+
+    <div class="grid-kpis">
+      <div class="kpi card">
+        <span class="kpi-valor">{{ r.incidenciasHoy }}</span>
+        <span class="kpi-label">Incidencias hoy</span>
+      </div>
+      <div class="kpi card">
+        <span class="kpi-valor">{{ r.pendientes }}</span>
+        <span class="kpi-label">Pendientes</span>
+      </div>
+      <div class="kpi card">
+        <span class="kpi-valor">{{ r.notificadas }}</span>
+        <span class="kpi-label">Notificadas</span>
+      </div>
+      <div class="kpi card">
+        <span class="kpi-valor">{{ r.errorWhatsapp }}</span>
+        <span class="kpi-label">Error WhatsApp</span>
+      </div>
+      <div class="kpi card">
+        <span class="kpi-valor">{{ r.totalEdificios }}</span>
+        <span class="kpi-label">Edificios</span>
+      </div>
+      <div class="kpi card">
+        <span class="kpi-valor">{{ r.totalZonas }}</span>
+        <span class="kpi-label">Zonas</span>
+      </div>
+      <div class="kpi card">
+        <span class="kpi-valor">{{ r.totalDepartamentos }}</span>
+        <span class="kpi-label">Departamentos</span>
+      </div>
+    </div>
+
+    <div class="grid-dos">
+      <div class="card panel">
+        <h3>Últimas incidencias</h3>
+        <div class="lista-incidencias">
+          @for (inc of r.ultimasIncidencias; track inc.id) {
+            <a class="fila-incidencia" [routerLink]="['/admin/incidencias', inc.id]">
+              <div>
+                <strong>{{ inc.codigo }}</strong>
+                <span class="fila-sub">{{ inc.edificio }} · {{ inc.zona }} · {{ inc.departamento }}</span>
+              </div>
+              <span class="badge" [ngClass]="{
+                'badge-success': inc.estado === 'RESUELTA' || inc.estado === 'NOTIFICADA',
+                'badge-warning': inc.estado === 'NUEVA' || inc.estado === 'EN_CURSO' || inc.estado === 'EN_REVISION',
+                'badge-danger': inc.estado === 'ERROR_NOTIFICACION',
+                'badge-neutral': inc.estado === 'CERRADA' || inc.estado === 'DESCARTADA'
+              }">{{ inc.estado }}</span>
+            </a>
+          } @empty {
+            <p>Todavía no se han recibido incidencias.</p>
+          }
+        </div>
+      </div>
+
+      <div class="card panel">
+        <h3>Zonas con más incidencias</h3>
+        <ul class="lista-ranking">
+          @for (z of r.zonasConMasIncidencias; track z.zona) {
+            <li><span>{{ z.zona }}</span><strong>{{ z.total }}</strong></li>
+          } @empty {
+            <p>Sin datos todavía.</p>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+</div>

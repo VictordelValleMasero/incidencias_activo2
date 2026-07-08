@@ -1,0 +1,107 @@
+<div class="pagina">
+  <header class="pagina-header">
+    <div>
+      <h1>Responsables</h1>
+      <p>Personas que reciben las notificaciones de incidencias por WhatsApp</p>
+    </div>
+    <button class="btn btn-primary" (click)="abrirNuevo()">+ Nuevo responsable</button>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Departamento</th>
+          <th>Cargo</th>
+          <th>Teléfono WhatsApp</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (resp of responsables(); track resp.id) {
+          <tr (click)="abrirEdicion(resp)">
+            <td>{{ resp.nombre }} {{ resp.apellidos }}</td>
+            <td>{{ nombreDepartamento(resp.departamentoId) }}</td>
+            <td>{{ resp.cargo || '—' }}</td>
+            <td>{{ resp.telefonoWhatsapp }}</td>
+            <td>
+              <span class="badge" [ngClass]="resp.estado ? 'badge-success' : 'badge-neutral'">
+                {{ resp.estado ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-danger" (click)="eliminar(resp); $event.stopPropagation()">Desactivar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6">Todavía no hay responsables creados.</td></tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>
+
+@if (mostrarModal()) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>{{ editandoId() ? 'Editar responsable' : 'Nuevo responsable' }}</h2>
+
+      @if (errorMensaje()) {
+        <div class="alert alert-error">{{ errorMensaje() }}</div>
+      }
+
+      <form [formGroup]="formulario" (ngSubmit)="guardar()">
+        <div class="form-field">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" formControlName="nombre" />
+        </div>
+        <div class="form-field">
+          <label for="apellidos">Apellidos</label>
+          <input id="apellidos" formControlName="apellidos" />
+        </div>
+        <div class="form-field">
+          <label for="cargo">Cargo</label>
+          <input id="cargo" formControlName="cargo" />
+        </div>
+        <div class="form-field">
+          <label for="departamentoId">Departamento</label>
+          <select id="departamentoId" formControlName="departamentoId">
+            <option [ngValue]="null" disabled>Selecciona un departamento</option>
+            @for (dep of departamentos(); track dep.id) {
+              <option [ngValue]="dep.id">{{ dep.nombre }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="telefonoWhatsapp">Teléfono WhatsApp (con prefijo internacional)</label>
+          <input id="telefonoWhatsapp" formControlName="telefonoWhatsapp" placeholder="+34600111222" />
+          @if (formulario.get('telefonoWhatsapp')?.invalid && formulario.get('telefonoWhatsapp')?.touched) {
+            <span class="field-error">Formato esperado: +34600111222</span>
+          }
+        </div>
+        <div class="form-field">
+          <label for="email">Email</label>
+          <input id="email" type="email" formControlName="email" />
+        </div>
+        <div class="form-field">
+          <label for="horario">Horario de disponibilidad</label>
+          <input id="horario" formControlName="horario" placeholder="Ej. L-V 08:00-18:00" />
+        </div>
+        <div class="form-field form-field-check">
+          <label><input type="checkbox" formControlName="estado" /> Activo</label>
+        </div>
+
+        <div class="modal-acciones">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+            @if (guardando()) { Guardando... } @else { Guardar }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

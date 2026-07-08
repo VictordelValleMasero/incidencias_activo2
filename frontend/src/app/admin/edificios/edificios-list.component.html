@@ -1,0 +1,87 @@
+<div class="pagina">
+  <header class="pagina-header">
+    <div>
+      <h1>Edificios</h1>
+      <p>Edificios donde se pueden comunicar incidencias (p.ej. Jarrods, Campus)</p>
+    </div>
+    <button class="btn btn-primary" (click)="abrirNuevo()">+ Nuevo edificio</button>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Orden</th>
+          <th>Nombre</th>
+          <th>Código</th>
+          <th>Descripción</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (edificio of edificios(); track edificio.id) {
+          <tr (click)="abrirEdicion(edificio)">
+            <td>{{ edificio.orden }}</td>
+            <td>{{ edificio.nombre }}</td>
+            <td>{{ edificio.codigo }}</td>
+            <td>{{ edificio.descripcion || '—' }}</td>
+            <td>
+              <span class="badge" [ngClass]="edificio.estado ? 'badge-success' : 'badge-neutral'">
+                {{ edificio.estado ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-danger" (click)="eliminar(edificio); $event.stopPropagation()">Desactivar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6">Todavía no hay edificios creados.</td></tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>
+
+@if (mostrarModal()) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>{{ editandoId() ? 'Editar edificio' : 'Nuevo edificio' }}</h2>
+
+      @if (errorMensaje()) {
+        <div class="alert alert-error">{{ errorMensaje() }}</div>
+      }
+
+      <form [formGroup]="formulario" (ngSubmit)="guardar()">
+        <div class="form-field">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" formControlName="nombre" placeholder="Ej. Jarrods" />
+        </div>
+        <div class="form-field">
+          <label for="codigo">Código interno</label>
+          <input id="codigo" formControlName="codigo" placeholder="Ej. JARRODS" />
+        </div>
+        <div class="form-field">
+          <label for="descripcion">Descripción</label>
+          <textarea id="descripcion" formControlName="descripcion" rows="2"></textarea>
+        </div>
+        <div class="form-field">
+          <label for="orden">Orden</label>
+          <input id="orden" type="number" formControlName="orden" />
+        </div>
+        <div class="form-field form-field-check">
+          <label><input type="checkbox" formControlName="estado" /> Edificio activo</label>
+        </div>
+
+        <div class="modal-acciones">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+            @if (guardando()) { Guardando... } @else { Guardar }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

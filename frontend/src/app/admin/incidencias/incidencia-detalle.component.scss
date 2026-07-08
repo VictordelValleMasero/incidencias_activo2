@@ -1,0 +1,84 @@
+:host {
+  display: block;
+}
+
+.volver {
+  display: inline-block;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-primary);
+  }
+}
+
+.badge-lg {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.9rem;
+}
+
+.descripcion {
+  white-space: pre-wrap;
+  color: var(--color-text);
+}
+
+.galeria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+
+  img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+  }
+}
+
+.historial {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.85rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--color-border);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+.historial-fecha {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.historial-comentario {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.estado-whatsapp {
+  margin: 0.75rem 0;
+}
+
+.mensaje-whatsapp {
+  white-space: pre-wrap;
+  font-size: 0.82rem;
+  background: var(--color-bg-alt);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.9rem;
+}

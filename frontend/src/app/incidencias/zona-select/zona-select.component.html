@@ -1,0 +1,59 @@
+<div class="pantalla">
+  <header class="cabecera">
+    <button type="button" class="btn-volver" (click)="volver()" aria-label="Volver">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 5l-7 7 7 7" />
+      </svg>
+    </button>
+    <h1>Selecciona la zona</h1>
+    <span class="spacer"></span>
+  </header>
+
+  @if (edificioNombre()) {
+    <p class="subtitulo">Edificio: <strong>{{ edificioNombre() }}</strong></p>
+  }
+
+  @if (mostrarBuscador()) {
+    <div class="buscador">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7" />
+        <path d="M21 21l-4.3-4.3" />
+      </svg>
+      <input
+        type="search"
+        placeholder="Buscar zona..."
+        [ngModel]="textoBusqueda()"
+        (ngModelChange)="textoBusqueda.set($event)"
+      />
+    </div>
+  }
+
+  @if (cargando()) {
+    <div class="estado-centrado">
+      <div class="spinner"></div>
+      <p>Cargando zonas...</p>
+    </div>
+  }
+
+  @if (!cargando() && error()) {
+    <div class="alert alert-error">
+      {{ error() }}
+      <button type="button" class="btn btn-secondary reintentar" (click)="cargar()">Reintentar</button>
+    </div>
+  }
+
+  @if (!cargando() && !error()) {
+    <div class="lista-zonas">
+      @for (zona of zonasFiltradas(); track zona.id) {
+        <button type="button" class="tarjeta-zona" (click)="seleccionar(zona)">
+          <span>{{ zona.nombre }}</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      } @empty {
+        <p class="vacio">No se han encontrado zonas con ese nombre.</p>
+      }
+    </div>
+  }
+</div>

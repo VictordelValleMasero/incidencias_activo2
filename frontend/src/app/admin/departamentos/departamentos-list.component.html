@@ -1,0 +1,89 @@
+<div class="pagina">
+  <header class="pagina-header">
+    <div>
+      <h1>Departamentos</h1>
+      <p>Mantenimiento, limpieza, seguridad y demás equipos que reciben incidencias</p>
+    </div>
+    <button class="btn btn-primary" (click)="abrirNuevo()">+ Nuevo departamento</button>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Responsable principal</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (dep of departamentos(); track dep.id) {
+          <tr (click)="abrirEdicion(dep)">
+            <td>{{ dep.nombre }}</td>
+            <td>{{ nombreResponsable(dep.responsablePrincipalId) }}</td>
+            <td>
+              <span class="badge" [ngClass]="dep.estado ? 'badge-success' : 'badge-neutral'">
+                {{ dep.estado ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-danger" (click)="eliminar(dep); $event.stopPropagation()">Desactivar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="4">Todavía no hay departamentos creados.</td></tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>
+
+@if (mostrarModal()) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>{{ editandoId() ? 'Editar departamento' : 'Nuevo departamento' }}</h2>
+
+      @if (errorMensaje()) {
+        <div class="alert alert-error">{{ errorMensaje() }}</div>
+      }
+
+      <form [formGroup]="formulario" (ngSubmit)="guardar()">
+        <div class="form-field">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" formControlName="nombre" placeholder="Ej. Mantenimiento" />
+        </div>
+        <div class="form-field">
+          <label for="descripcion">Descripción</label>
+          <textarea id="descripcion" formControlName="descripcion" rows="2"></textarea>
+        </div>
+        <div class="form-field">
+          <label for="responsablePrincipalId">Responsable principal</label>
+          <select id="responsablePrincipalId" formControlName="responsablePrincipalId">
+            <option [ngValue]="null">Sin responsable asignado</option>
+            @for (r of responsables(); track r.id) {
+              <option [ngValue]="r.id">{{ r.nombre }} {{ r.apellidos }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="plantillaWhatsapp">Plantilla de mensaje de WhatsApp (opcional)</label>
+          <textarea id="plantillaWhatsapp" formControlName="plantillaWhatsapp" rows="3" placeholder="Usa variables como edificio, zona, departamento, descripcion, fecha, hora..."></textarea>
+          <span class="field-hint">Variables disponibles: edificio, zona, departamento, fecha, hora, descripcion, numero_imagenes, id_incidencia, url_incidencia. Si se deja vacío se usa la plantilla por defecto.</span>
+        </div>
+        <div class="form-field form-field-check">
+          <label><input type="checkbox" formControlName="estado" /> Departamento activo</label>
+        </div>
+
+        <div class="modal-acciones">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+            @if (guardando()) { Guardando... } @else { Guardar }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

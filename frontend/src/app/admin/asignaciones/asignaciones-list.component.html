@@ -1,0 +1,114 @@
+<div class="pagina">
+  <header class="pagina-header">
+    <div>
+      <h1>Asignaciones</h1>
+      <p>Vincula edificio + zona + departamento con el responsable que debe ser notificado</p>
+    </div>
+    <button class="btn btn-primary" (click)="abrirNueva()">+ Nueva asignación</button>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Edificio</th>
+          <th>Zona</th>
+          <th>Departamento</th>
+          <th>Responsable</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (a of asignaciones(); track a.id) {
+          <tr (click)="abrirEdicion(a)">
+            <td>{{ a.edificioNombre || nombreEdificio(a.edificioId) }}</td>
+            <td>{{ a.zonaNombre || nombreZona(a.zonaId) }}</td>
+            <td>{{ a.departamentoNombre || nombreDepartamento(a.departamentoId) }}</td>
+            <td>{{ a.responsableNombre || nombreResponsable(a.responsableId) }}</td>
+            <td>
+              <span class="badge" [ngClass]="a.estado ? 'badge-success' : 'badge-neutral'">
+                {{ a.estado ? 'Activa' : 'Inactiva' }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-danger" (click)="eliminar(a); $event.stopPropagation()">Eliminar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6">Todavía no hay asignaciones creadas.</td></tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>
+
+@if (mostrarModal()) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>{{ editandoId() ? 'Editar asignación' : 'Nueva asignación' }}</h2>
+
+      @if (errorMensaje()) {
+        <div class="alert alert-error">{{ errorMensaje() }}</div>
+      }
+
+      <form [formGroup]="formulario" (ngSubmit)="guardar()">
+        <div class="form-field">
+          <label for="edificioId">Edificio</label>
+          <select id="edificioId" formControlName="edificioId">
+            <option [ngValue]="null" disabled>Selecciona un edificio</option>
+            @for (edificio of edificios(); track edificio.id) {
+              <option [ngValue]="edificio.id">{{ edificio.nombre }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="zonaId">Zona</label>
+          <select id="zonaId" formControlName="zonaId" [disabled]="!edificioSeleccionado()">
+            <option [ngValue]="null" disabled>Selecciona una zona</option>
+            @for (zona of zonasDisponibles(); track zona.id) {
+              <option [ngValue]="zona.id">{{ zona.nombre }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="departamentoId">Departamento</label>
+          <select id="departamentoId" formControlName="departamentoId">
+            <option [ngValue]="null" disabled>Selecciona un departamento</option>
+            @for (dep of departamentos(); track dep.id) {
+              <option [ngValue]="dep.id">{{ dep.nombre }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="responsableId">Responsable</label>
+          <select id="responsableId" formControlName="responsableId" [disabled]="!departamentoSeleccionado()">
+            <option [ngValue]="null" disabled>Selecciona un responsable</option>
+            @for (r of responsablesDisponibles(); track r.id) {
+              <option [ngValue]="r.id">{{ r.nombre }} {{ r.apellidos }}</option>
+            }
+          </select>
+          @if (departamentoSeleccionado() && responsablesDisponibles().length === 0) {
+            <span class="field-hint">Este departamento no tiene responsables activos todavía.</span>
+          }
+        </div>
+        <div class="form-field">
+          <label for="observaciones">Observaciones</label>
+          <textarea id="observaciones" formControlName="observaciones" rows="2"></textarea>
+        </div>
+        <div class="form-field form-field-check">
+          <label><input type="checkbox" formControlName="estado" /> Asignación activa</label>
+        </div>
+
+        <div class="modal-acciones">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+            @if (guardando()) { Guardando... } @else { Guardar }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

@@ -1,0 +1,103 @@
+<div class="pagina">
+  <a routerLink="/admin/incidencias" class="volver">← Volver a incidencias</a>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+  @if (!cargando() && incidencia(); as inc) {
+    <header class="pagina-header">
+      <div>
+        <h1>{{ inc.codigo }}</h1>
+        <p>{{ inc.fecha }} {{ inc.hora }} · {{ inc.edificio }} · {{ inc.zona }} · {{ inc.departamento }}</p>
+      </div>
+      <span class="badge badge-lg" [ngClass]="{
+        'badge-success': inc.estado === 'RESUELTA' || inc.estado === 'NOTIFICADA',
+        'badge-warning': inc.estado === 'NUEVA' || inc.estado === 'EN_CURSO' || inc.estado === 'EN_REVISION',
+        'badge-danger': inc.estado === 'ERROR_NOTIFICACION',
+        'badge-neutral': inc.estado === 'CERRADA' || inc.estado === 'DESCARTADA'
+      }">{{ inc.estado }}</span>
+    </header>
+
+    @if (mensajeExito()) {
+      <div class="alert alert-success">{{ mensajeExito() }}</div>
+    }
+
+    <div class="grid-dos">
+      <div class="card panel">
+        <h3>Descripción</h3>
+        <p class="descripcion">{{ inc.descripcion }}</p>
+
+        @if (inc.imagenes.length > 0) {
+          <h3>Imágenes adjuntas</h3>
+          <div class="galeria">
+            @for (img of imagenesCargadas(); track img.id) {
+              <a [href]="img.url" target="_blank" [title]="img.nombreOriginal"><img [src]="img.url" [alt]="img.nombreOriginal" /></a>
+            }
+          </div>
+        }
+
+        <h3>Historial</h3>
+        <ul class="historial">
+          @for (h of inc.historial; track h.fecha) {
+            <li>
+              <span class="historial-fecha">{{ h.fecha }}</span>
+              <span><strong>{{ h.estado }}</strong></span>
+              @if (h.comentario) { <span class="historial-comentario">{{ h.comentario }}</span> }
+            </li>
+          } @empty {
+            <p>Sin historial registrado.</p>
+          }
+        </ul>
+      </div>
+
+      <div>
+        <div class="card panel">
+          <h3>Responsable notificado</h3>
+          @if (inc.responsableNotificado) {
+            <p><strong>{{ inc.responsableNotificado }}</strong></p>
+            <p>{{ inc.telefonoNotificado }}</p>
+          } @else {
+            <p>No hay responsable asignado para este edificio/zona/departamento.</p>
+          }
+
+          <div class="estado-whatsapp">
+            @if (inc.whatsappEstado === 'ENVIADO') {
+              <span class="badge badge-success">WhatsApp enviado</span>
+            } @else {
+              <span class="badge badge-danger">{{ inc.whatsappError || inc.whatsappEstado || 'No enviado' }}</span>
+            }
+          </div>
+
+          @if (inc.mensajeWhatsapp) {
+            <p class="mensaje-whatsapp">{{ inc.mensajeWhatsapp }}</p>
+          }
+
+          <button class="btn btn-secondary btn-block" (click)="reenviarWhatsapp()" [disabled]="reenviando()">
+            @if (reenviando()) { Reenviando... } @else { Reenviar WhatsApp }
+          </button>
+        </div>
+
+        <div class="card panel">
+          <h3>Gestión de la incidencia</h3>
+          <form [formGroup]="formularioEstado" (ngSubmit)="guardarEstado()">
+            <div class="form-field">
+              <label for="estado">Cambiar estado</label>
+              <select id="estado" formControlName="estado">
+                @for (estado of estados; track estado) {
+                  <option [value]="estado">{{ estado }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="observaciones">Observaciones internas</label>
+              <textarea id="observaciones" formControlName="observaciones" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" [disabled]="guardandoEstado()">
+              @if (guardandoEstado()) { Guardando... } @else { Guardar cambios }
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+</div>

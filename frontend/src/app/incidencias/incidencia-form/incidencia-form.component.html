@@ -1,0 +1,113 @@
+<div class="pantalla">
+  <header class="cabecera">
+    <button type="button" class="btn-volver" (click)="volver()" aria-label="Volver">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 5l-7 7 7 7" />
+      </svg>
+    </button>
+    <h1>Comunicar incidencia</h1>
+    <span class="spacer"></span>
+  </header>
+
+  <div class="chips">
+    <span class="chip">{{ edificioNombre() || 'Edificio' }}</span>
+    <span class="chip">{{ zonaNombre() || 'Zona' }}</span>
+  </div>
+
+  @if (estadoCarga() === 'cargando') {
+    <div class="estado-centrado">
+      <div class="spinner"></div>
+      <p>Cargando formulario...</p>
+    </div>
+  }
+
+  @if (estadoCarga() === 'error') {
+    <div class="alert alert-error">
+      No se han podido cargar los departamentos disponibles para esta zona.
+      <button type="button" class="btn btn-secondary reintentar" (click)="cargarDepartamentos()">Reintentar</button>
+    </div>
+  }
+
+  @if (estadoCarga() === 'listo') {
+    @if (errorEnvio()) {
+      <div class="alert alert-error">{{ errorEnvio() }}</div>
+    }
+
+    <form [formGroup]="formulario" (ngSubmit)="enviar()" class="formulario">
+      <div class="form-field">
+        <label for="departamento">¿A qué departamento va dirigida la incidencia?</label>
+        <select id="departamento" formControlName="departamentoId">
+          <option [ngValue]="null" disabled>Selecciona un departamento</option>
+          @for (dep of departamentos(); track dep.id) {
+            <option [ngValue]="dep.id">{{ dep.nombre }}</option>
+          }
+        </select>
+        @if (formulario.get('departamentoId')?.invalid && formulario.get('departamentoId')?.touched) {
+          <span class="field-error">Selecciona un departamento</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label for="descripcion">Resumen de la incidencia</label>
+        <textarea
+          id="descripcion"
+          formControlName="descripcion"
+          rows="5"
+          placeholder="Explica brevemente qué ocurre…"
+          maxlength="1000"
+        ></textarea>
+        <span class="field-hint contador" [class.limite]="descripcionLength > 900">{{ descripcionLength }}/1000</span>
+        @if (formulario.get('descripcion')?.touched && formulario.get('descripcion')?.errors?.['required']) {
+          <span class="field-error">La descripción es obligatoria</span>
+        }
+        @if (formulario.get('descripcion')?.touched && formulario.get('descripcion')?.errors?.['minlength']) {
+          <span class="field-error">Escribe al menos 10 caracteres</span>
+        }
+      </div>
+
+      <div class="form-field">
+        <label>Imágenes (opcional)</label>
+        <label class="boton-adjuntar" for="imagenes-input">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 7h3l2-2h6l2 2h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z" />
+            <circle cx="12" cy="13" r="3.5" />
+          </svg>
+          Añadir fotos
+        </label>
+        <input
+          id="imagenes-input"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          capture="environment"
+          multiple
+          (change)="onSeleccionarImagenes($event)"
+          hidden
+        />
+        <span class="field-hint">Hasta 5 imágenes (JPG, PNG o WEBP), máximo 5MB cada una</span>
+
+        @if (errorImagenes()) {
+          <span class="field-error">{{ errorImagenes() }}</span>
+        }
+
+        @if (previews().length > 0) {
+          <div class="miniaturas">
+            @for (preview of previews(); track preview; let i = $index) {
+              <div class="miniatura">
+                <img [src]="preview" alt="Imagen adjunta" />
+                <button type="button" class="quitar" (click)="eliminarImagen(i)" aria-label="Quitar imagen">✕</button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block btn-enviar" [disabled]="formulario.invalid || enviando()">
+        @if (enviando()) {
+          Enviando...
+        } @else {
+          Enviar incidencia
+        }
+      </button>
+    </form>
+  }
+</div>

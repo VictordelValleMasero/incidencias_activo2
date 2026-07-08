@@ -1,0 +1,134 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--a2-bg);
+}
+
+.home {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: 1.5rem 1.1rem 6.5rem;
+  color: var(--a2-text);
+}
+
+.home-header {
+  h1 {
+    color: var(--a2-green);
+    font-size: 1.4rem;
+    margin: 0.25rem 0 1rem;
+  }
+}
+
+.card {
+  background: var(--a2-surface);
+  border: 1px solid var(--a2-border);
+  border-radius: 18px;
+}
+
+.nominas {
+  margin-bottom: 1.75rem;
+  overflow: hidden;
+}
+
+.nomina-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid var(--a2-border);
+  font-size: 1.05rem;
+  color: var(--a2-text);
+
+  &.no-border {
+    border-bottom: none;
+  }
+}
+
+.icon-download {
+  width: 22px;
+  height: 22px;
+  color: var(--a2-green);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.9rem;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--a2-surface);
+  border: 1px solid var(--a2-border);
+  border-radius: 18px;
+  padding: 0.9rem 0.5rem 1rem;
+  cursor: pointer;
+  color: var(--a2-text);
+  font-family: inherit;
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+.tile-icon {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 46%;
+    height: 46%;
+  }
+}
+
+.tile-salario { background: var(--a2-yellow); color: var(--a2-yellow-ink); }
+.tile-jornada { background: var(--a2-blue); color: var(--a2-blue-ink); }
+.tile-documentos { background: var(--a2-yellow); color: var(--a2-yellow-ink); }
+.tile-formacion { background: var(--a2-lightgreen); color: var(--a2-lightgreen-ink); }
+.tile-informacion { background: var(--a2-blue); color: var(--a2-blue-ink); }
+.tile-incidencias { background: var(--a2-salmon); color: var(--a2-salmon-ink); }
+
+.tile-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0.9rem 1rem calc(0.9rem + env(safe-area-inset-bottom));
+  background: var(--a2-bg);
+  border-top: 1px solid var(--a2-border);
+}
+
+.nav-item {
+  background: none;
+  border: none;
+  color: var(--a2-text-muted);
+  padding: 0.4rem;
+  cursor: pointer;
+
+  svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  &.active {
+    color: var(--a2-green);
+  }
+}

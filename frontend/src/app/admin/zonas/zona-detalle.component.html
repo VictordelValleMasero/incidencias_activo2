@@ -1,0 +1,95 @@
+<div class="pagina">
+  <a routerLink="/admin/zonas" class="volver">← Volver a zonas</a>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  }
+  @if (!cargando() && zona(); as z) {
+    <header class="pagina-header">
+      <div>
+        <h1>{{ z.nombre }}</h1>
+        <p>Código interno: {{ z.codigo }}</p>
+      </div>
+    </header>
+
+    @if (mensajeExito()) {
+      <div class="alert alert-success">{{ mensajeExito() }}</div>
+    }
+    @if (errorMensaje()) {
+      <div class="alert alert-error">{{ errorMensaje() }}</div>
+    }
+
+    <div class="grid-dos">
+      <div class="card panel">
+        <h3>Datos generales</h3>
+        <form [formGroup]="formulario" (ngSubmit)="guardar()">
+          <div class="form-field">
+            <label for="edificioId">Edificio</label>
+            <select id="edificioId" formControlName="edificioId">
+              @for (edificio of edificios(); track edificio.id) {
+                <option [ngValue]="edificio.id">{{ edificio.nombre }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" formControlName="nombre" />
+          </div>
+          <div class="form-field">
+            <label for="codigo">Código interno</label>
+            <input id="codigo" formControlName="codigo" />
+          </div>
+          <div class="form-field">
+            <label for="descripcion">Descripción</label>
+            <textarea id="descripcion" formControlName="descripcion" rows="2"></textarea>
+          </div>
+          <div class="form-field">
+            <label for="imagen">URL de imagen (opcional)</label>
+            <input id="imagen" formControlName="imagen" placeholder="https://..." />
+          </div>
+          <div class="form-field">
+            <label for="orden">Orden</label>
+            <input id="orden" type="number" formControlName="orden" />
+          </div>
+          <div class="form-field form-field-check">
+            <label><input type="checkbox" formControlName="estado" /> Zona activa</label>
+          </div>
+
+          <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+            @if (guardando()) { Guardando... } @else { Guardar cambios }
+          </button>
+        </form>
+      </div>
+
+      <div>
+        <div class="card panel imagen-panel">
+          <h3>Imagen de la zona</h3>
+          @if (z.imagen) {
+            <img [src]="z.imagen" alt="Imagen de la zona" class="preview-imagen" />
+          } @else {
+            <div class="sin-imagen">Sin imagen configurada</div>
+          }
+        </div>
+
+        <div class="card panel">
+          <h3>Departamentos / responsables asignados</h3>
+          <p>Configuración activa para esta zona (gestiona los detalles desde Asignaciones).</p>
+          <ul class="lista-asignaciones">
+            @for (a of asignacionesZona(); track a.id) {
+              <li>
+                <strong>{{ a.departamentoNombre || ('Departamento #' + a.departamentoId) }}</strong>
+                <span>{{ a.responsableNombre || ('Responsable #' + a.responsableId) }}</span>
+                <span class="badge" [ngClass]="a.estado ? 'badge-success' : 'badge-neutral'">
+                  {{ a.estado ? 'Activa' : 'Inactiva' }}
+                </span>
+              </li>
+            } @empty {
+              <p>Esta zona todavía no tiene departamentos asignados.</p>
+            }
+          </ul>
+          <a routerLink="/admin/asignaciones" class="btn btn-secondary btn-block">Gestionar asignaciones</a>
+        </div>
+      </div>
+    </div>
+  }
+</div>

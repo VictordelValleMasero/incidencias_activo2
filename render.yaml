@@ -1,0 +1,46 @@
+databases:
+  - name: activo2incidencias-db
+    databaseName: activo2incidencias
+    user: activo2incidencias
+    plan: free
+    postgresMajorVersion: "16"
+
+services:
+  - type: web
+    name: activo2incidencias-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_HOST
+        fromDatabase:
+          name: activo2incidencias-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: activo2incidencias-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: activo2incidencias-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: activo2incidencias-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: activo2incidencias-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: APP_PUBLIC_URL
+        sync: false
+      - key: WHATSAPP_PROVIDER
+        value: mock
+      - key: WHATSAPP_SENDER
+        value: "+34600000000"

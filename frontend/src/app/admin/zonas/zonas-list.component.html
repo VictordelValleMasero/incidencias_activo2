@@ -1,0 +1,89 @@
+<div class="pagina">
+  <header class="pagina-header">
+    <div>
+      <h1>Zonas</h1>
+      <p>Zonas físicas de cada edificio donde se pueden reportar incidencias</p>
+    </div>
+    <button class="btn btn-primary" (click)="abrirNuevaZona()">+ Nueva zona</button>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else {
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Orden</th>
+          <th>Nombre</th>
+          <th>Código</th>
+          <th>Edificio</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (zona of zonas(); track zona.id) {
+          <tr (click)="abrirZona(zona.id)">
+            <td>{{ zona.orden }}</td>
+            <td>{{ zona.nombre }}</td>
+            <td>{{ zona.codigo }}</td>
+            <td>{{ nombreEdificio(zona.edificioId) }}</td>
+            <td>
+              <span class="badge" [ngClass]="zona.estado ? 'badge-success' : 'badge-neutral'">
+                {{ zona.estado ? 'Activa' : 'Inactiva' }}
+              </span>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="5">Todavía no hay zonas creadas.</td></tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>
+
+@if (mostrarModal()) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>Nueva zona</h2>
+
+      @if (errorMensaje()) {
+        <div class="alert alert-error">{{ errorMensaje() }}</div>
+      }
+
+      <form [formGroup]="formulario" (ngSubmit)="guardar()">
+        <div class="form-field">
+          <label for="edificioId">Edificio</label>
+          <select id="edificioId" formControlName="edificioId">
+            <option [ngValue]="null" disabled>Selecciona un edificio</option>
+            @for (edificio of edificios(); track edificio.id) {
+              <option [ngValue]="edificio.id">{{ edificio.nombre }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="nombre">Nombre de la zona</label>
+          <input id="nombre" formControlName="nombre" placeholder="Ej. Recepción" />
+        </div>
+        <div class="form-field">
+          <label for="codigo">Código interno</label>
+          <input id="codigo" formControlName="codigo" placeholder="Ej. ZN-RECEP-01" />
+        </div>
+        <div class="form-field">
+          <label for="descripcion">Descripción</label>
+          <textarea id="descripcion" formControlName="descripcion" rows="2"></textarea>
+        </div>
+        <div class="form-field">
+          <label for="orden">Orden</label>
+          <input id="orden" type="number" formControlName="orden" />
+        </div>
+
+        <div class="modal-acciones">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+            @if (guardando()) { Creando... } @else { Crear zona }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
